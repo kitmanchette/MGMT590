@@ -48,10 +48,10 @@ with col_ins1:
 
 with col_ins2:
     st.warning(
-        "**2. Early Warning of Decline**\n\n"
-        "The **Decline** segment accounts for nearly $3,650 in total spend across 19 transacting accounts. "
-        "Marketing initiatives must prioritize immediate re-engagement campaigns and proactive outreach to stabilize "
-        "satisfaction and mitigate active churn metrics."
+        "**2. Early Warning of Decline & Outlier Risk**\n\n"
+        "Look closely at the data: half of these high-ticket outliers have a CustomerSatisfaction rating of 1 "
+        "and belong to the Decline segment. This tells a critical business story—NovaRetail is losing its "
+        "biggest spenders due to poor satisfaction on expensive items. Removing them would hide this massive vulnerability."
     )
 
 with col_ins3:
@@ -67,7 +67,7 @@ st.markdown("---")
 # STEP 4 — Sidebar Configurations
 st.sidebar.header("Dashboard Controls")
 
-# Group By dropdown is now structurally at the absolute top of the sidebar
+# Group By dropdown is structurally at the absolute top of the sidebar
 groupby_labels = {
     "Customer Segment": "label",
     "Customer Satisfaction": "CustomerSatisfaction",
@@ -130,9 +130,7 @@ else:
     
     st.markdown("---")
     
-    # STEP 6 & 7 — Aggregation & Plot
-    # For Box Plots, we use the original non-aggregated transaction level dataframe 
-    # to render full data distributions (median, quartiles, and variance).
+    # STEP 6 & 7 — Plotting Box Plot Distributions
     plot_df = filtered_df.copy()
     if groupby_variable == 'CustomerSatisfaction':
         plot_df[groupby_variable] = plot_df[groupby_variable].astype(str)
