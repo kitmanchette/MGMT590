@@ -48,10 +48,12 @@ with col_ins1:
 
 with col_ins2:
     st.warning(
-        "**2. Early Warning of Decline & Outlier Risk**\n\n"
-        "Look closely at the data: half of these high-ticket outliers have a CustomerSatisfaction rating of 1 "
-        "and belong to the Decline segment. This tells a critical business story—NovaRetail is losing its "
-        "biggest spenders due to poor satisfaction on expensive items. Removing them would hide this massive vulnerability."
+        "**2. High-Value Attrition Risk & Revenue Vulnerability**\n\n"
+        "Granular distribution analysis reveals a critical risk exposure: 50% of NovaRetail's highest-ticket "
+        "transactional outliers (primarily concentrated in high-end Electronics) are tied to a Customer Satisfaction "
+        "rating of 1 and fall squarely within the **Decline** segment. Rather than treating these extreme spend data points "
+        "as statistical anomalies to be scrubbed, they must be recognized as an early warning sign that NovaRetail is "
+        "actively losing its highest-value accounts due to post-purchase dissatisfaction."
     )
 
 with col_ins3:
