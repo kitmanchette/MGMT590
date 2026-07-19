@@ -5,6 +5,22 @@ import plotly.express as px
 # STEP 2 — Page Config
 st.set_page_config(layout="wide")
 
+# FIX: Inject Custom CSS to prevent sidebar dropdown clipping and allow scrolling
+st.markdown(
+    """
+    <style>
+    /* Allow the sidebar container to show overflowing dropdown menus */
+    [data-testid="stSidebarUserContent"] {
+        padding-bottom: 20rem; /* Adds scrollable space at the bottom */
+    }
+    div[data-baseweb="select"] {
+        z-index: 9999 !important; /* Forces the dropdown to stay on top */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # Title
 st.title("Nova Retail Customer Analysis")
 
@@ -129,7 +145,6 @@ else:
     st.markdown("---")
     
     # STEP 6 — Aggregation based on the dropdown variable
-    # Convert grouping field to string for clean categorical bar chart representation if it's numeric (like satisfaction score)
     agg_df = filtered_df.copy()
     if groupby_variable == 'CustomerSatisfaction':
         agg_df[groupby_variable] = agg_df[groupby_variable].astype(str)
