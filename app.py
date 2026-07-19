@@ -23,6 +23,10 @@ try:
         st.error(f"Missing logical fields: {missing_columns}")
         st.write("Actual Columns in Dataset:", df.columns.tolist())
         st.stop()
+        
+    # Consolidate '55-64' age group into '55+' as requested
+    df['CustomerAgeGroup'] = df['CustomerAgeGroup'].replace('55-64', '55+')
+    
 except FileNotFoundError:
     st.error("Dataset file not found in repository.")
     st.stop()
@@ -70,15 +74,18 @@ def create_sidebar_multiselect(label, options):
 region_options = df['CustomerRegion'].dropna().unique()
 channel_options = df['RetailChannel'].dropna().unique()
 category_options = df['ProductCategory'].dropna().unique()
+age_options = sorted(df['CustomerAgeGroup'].dropna().unique())
 
 selected_regions = create_sidebar_multiselect("Select Customer Region", region_options)
 selected_channels = create_sidebar_multiselect("Select Retail Channel", channel_options)
 selected_categories = create_sidebar_multiselect("Select Product Category", category_options)
+selected_ages = create_sidebar_multiselect("Select Customer Age Group", age_options)
 
 st.sidebar.markdown("---")
-# Dynamic Group By/Legend selection dropdown to change aggregation logic dynamically
+# Dynamic Group By/Legend selection dropdown including Customer Satisfaction
 groupby_labels = {
     "Customer Segment": "label",
+    "Customer Satisfaction": "CustomerSatisfaction",
     "Product Category": "ProductCategory",
     "Customer Region": "CustomerRegion",
     "Retail Channel": "RetailChannel",
@@ -104,6 +111,9 @@ if "All" not in selected_channels:
 if "All" not in selected_categories:
     filtered_df = filtered_df[filtered_df['ProductCategory'].isin(selected_categories)]
 
+if "All" not in selected_ages:
+    filtered_df = filtered_df[filtered_df['CustomerAgeGroup'].isin(selected_ages)]
+
 # STEP 9 — Edge Case Handling: Empty filter result
 if filtered_df.empty:
     st.warning("No data available matching the selected filter combinations. Please adjust your criteria.")
@@ -119,7 +129,12 @@ else:
     st.markdown("---")
     
     # STEP 6 — Aggregation based on the dropdown variable
-    agg_df = filtered_df.groupby(groupby_variable)['PurchaseAmount'].sum().reset_index()
+    # Convert grouping field to string for clean categorical bar chart representation if it's numeric (like satisfaction score)
+    agg_df = filtered_df.copy()
+    if groupby_variable == 'CustomerSatisfaction':
+        agg_df[groupby_variable] = agg_df[groupby_variable].astype(str)
+        
+    agg_df = agg_df.groupby(groupby_variable)['PurchaseAmount'].sum().reset_index()
     agg_df = agg_df.sort_values(by=groupby_variable)
     
     # STEP 7 — Plot
