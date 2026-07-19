@@ -5,22 +5,6 @@ import plotly.express as px
 # STEP 2 — Page Config
 st.set_page_config(layout="wide")
 
-# FIX: Inject Custom CSS to prevent sidebar dropdown clipping and allow scrolling
-st.markdown(
-    """
-    <style>
-    /* Allow the sidebar container to show overflowing dropdown menus */
-    [data-testid="stSidebarUserContent"] {
-        padding-bottom: 20rem; /* Adds scrollable space at the bottom */
-    }
-    div[data-baseweb="select"] {
-        z-index: 9999 !important; /* Forces the dropdown to stay on top */
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
 # Title
 st.title("Nova Retail Customer Analysis")
 
@@ -80,25 +64,10 @@ with col_ins3:
 
 st.markdown("---")
 
-# STEP 4 — Sidebar Filters
-st.sidebar.header("Dashboard Filters")
+# STEP 4 — Sidebar Configurations
+st.sidebar.header("Dashboard Controls")
 
-def create_sidebar_multiselect(label, options):
-    selected = st.sidebar.multiselect(label, options=["All"] + list(options), default=["All"])
-    return selected
-
-region_options = df['CustomerRegion'].dropna().unique()
-channel_options = df['RetailChannel'].dropna().unique()
-category_options = df['ProductCategory'].dropna().unique()
-age_options = sorted(df['CustomerAgeGroup'].dropna().unique())
-
-selected_regions = create_sidebar_multiselect("Select Customer Region", region_options)
-selected_channels = create_sidebar_multiselect("Select Retail Channel", channel_options)
-selected_categories = create_sidebar_multiselect("Select Product Category", category_options)
-selected_ages = create_sidebar_multiselect("Select Customer Age Group", age_options)
-
-st.sidebar.markdown("---")
-# Dynamic Group By/Legend selection dropdown including Customer Satisfaction
+# Group By dropdown is now structurally at the absolute top of the sidebar
 groupby_labels = {
     "Customer Segment": "label",
     "Customer Satisfaction": "CustomerSatisfaction",
@@ -109,11 +78,28 @@ groupby_labels = {
     "Customer Gender": "CustomerGender"
 }
 selected_groupby_label = st.sidebar.selectbox(
-    "Select Chart Group By / Legend Variable",
+    "Chart Group By / Legend Variable",
     options=list(groupby_labels.keys()),
     index=0
 )
 groupby_variable = groupby_labels[selected_groupby_label]
+
+st.sidebar.markdown("---")
+
+# Bundle the multiselect data filters into an expander to prevent visual clutter and clipping
+with st.sidebar.expander("Filter Data Slices", expanded=True):
+    def create_sidebar_multiselect(label, options):
+        return st.multiselect(label, options=["All"] + list(options), default=["All"])
+
+    region_options = df['CustomerRegion'].dropna().unique()
+    channel_options = df['RetailChannel'].dropna().unique()
+    category_options = df['ProductCategory'].dropna().unique()
+    age_options = sorted(df['CustomerAgeGroup'].dropna().unique())
+
+    selected_regions = create_sidebar_multiselect("Select Customer Region", region_options)
+    selected_channels = create_sidebar_multiselect("Select Retail Channel", channel_options)
+    selected_categories = create_sidebar_multiselect("Select Product Category", category_options)
+    selected_ages = create_sidebar_multiselect("Select Customer Age Group", age_options)
 
 # STEP 5 — Filtering Logic
 filtered_df = df.copy()
